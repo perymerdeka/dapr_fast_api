@@ -12,6 +12,7 @@ def create_app():
         generate_schemas=True,
         add_exception_handlers=True,
     )
+    # add routes
     app.include_router(router)
 
     return app
