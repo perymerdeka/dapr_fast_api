@@ -1,3 +1,4 @@
+import jwt
 from fastapi import (
     BackgroundTasks,
     UploadFile,
@@ -13,13 +14,17 @@ from fastapi.requests import Request
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from dotenv import dotenv_values
 
-config_credentials = dotenv_values("../.env")
+
+from .schema import EmailSchema
+from .models import UserModel
+
+credentials = dotenv_values("../.env")
 
 # config for email
 config: ConnectionConfig = ConnectionConfig(
-    MAIL_USERNAME="",
-    MAIL_PASSWORD="",
-    MAIL_FROM="",
+    MAIL_USERNAME=credentials["EMAIL"],
+    MAIL_PASSWORD=credentials["EMAIL_PASSWORD"],
+    MAIL_FROM=credentials["EMAIL"],
     MAIL_PORT=587,
     MAIL_SERVER="smtp.gmail.com",
     MAIL_TLS=True,
@@ -27,3 +32,11 @@ config: ConnectionConfig = ConnectionConfig(
     USE_CREDENTIALS=True,
 )
 
+
+async def send_email(email: EmailSchema, instance: UserModel):
+    token_data: dict = {
+        "id": instance.id,
+        "username": instance.username,
+    }
+    token = jwt.encode(token_data, credentials["SECRET"])
+    
