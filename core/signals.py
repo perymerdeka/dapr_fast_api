@@ -3,6 +3,8 @@ from tortoise import BaseDBAsyncClient
 from typing import Type, List, Optional
 
 from .models import UserModel, bussiness_pydantic
+from .email import send_email
+
 
 @post_save(sender=UserModel)
 async def create_bussiness(
@@ -19,4 +21,5 @@ async def create_bussiness(
         await bussiness_pydantic.from_tortoise_orm(bussiness_objects)
         
         # send email
+        await send_email([instance.email], instance)
         

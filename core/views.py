@@ -1,9 +1,14 @@
-from fastapi.responses import JSONResponse
-from fastapi import status
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.requests import Request
+from fastapi import HTTPException, status
+from fastapi.templating import Jinja2Templates
 
 from .models import user_pydanticIn, UserModel, user_pydantic
-from .authentication import get_hashed_password
+from .authentication import get_hashed_password, verify_token
 
+# configuring templates
+
+templates = Jinja2Templates(directory="templates")
 
 async def register(user: user_pydanticIn) -> JSONResponse:
     user_info: dict = user.dict(exclude_unset=True)
@@ -19,3 +24,17 @@ async def register(user: user_pydanticIn) -> JSONResponse:
         },
         media_type="application/json",
     )
+
+
+async def email_verification(request: Request, token: str) -> HTMLResponse:
+    user: UserModel = await verify_token(token)
+    if user and not user.is_verified:
+        user.is_verified = True
+        await user.save()
+        return templates.TemplateResponse("verification.html", {"request": request, "user": user.username})
+    
+    raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )    
