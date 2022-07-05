@@ -10,8 +10,8 @@ from .authentication import get_hashed_password, verify_token
 
 templates = Jinja2Templates(directory="templates")
 
-async def register(user: user_pydanticIn) -> JSONResponse:
-    user_info: dict = user.dict(exclude_unset=True)
+async def register(user: user_pydanticIn):
+    user_info = user.dict(exclude_unset=True)
     user_info["password"] = get_hashed_password(user_info["password"])
 
     # create user

@@ -1,4 +1,3 @@
-from dotenv import dotenv_values
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.staticfiles import StaticFiles
@@ -11,7 +10,7 @@ def create_app():
     
     # mount static files
     app.mount("/static", StaticFiles(directory="static"), name="static")
-    
+    from core import signals
     register_tortoise(
         app=app,
         db_url="postgres://postgres:1234@localhost:5432/ecommerce_db",

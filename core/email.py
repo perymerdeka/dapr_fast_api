@@ -35,7 +35,7 @@ config: ConnectionConfig = ConnectionConfig(
 
 
 async def send_email(email: EmailSchema, instance: UserModel):
-    print(credentials)
+    # print(credentials)
     token_data: dict = {
         "id": instance.id,
         "username": instance.username,
